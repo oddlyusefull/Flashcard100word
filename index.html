@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Flashcard One Word Substitution</title>
+<style>
+:root{--bg:#f4f7fb;--surf:#fff;--tx:#14213d;--mut:#5b6b85;--ac:#0e8fa8;--ac2:#6a5acd;--ok:#1f9d63;--no:#d6453d;--bd:#d9e2ee;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1624;--surf:#18223a;--tx:#eef3fb;--mut:#9fb0ca;--ac:#4cc9e0;--ac2:#9a8cff;--ok:#3ecf8e;--no:#ff7a70;--bd:#2a3858;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1624;--surf:#18223a;--tx:#eef3fb;--mut:#9fb0ca;--ac:#4cc9e0;--ac2:#9a8cff;--ok:#3ecf8e;--no:#ff7a70;--bd:#2a3858;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100%}
+main{max-width:560px;margin:0 auto;padding:18px 16px 28px}
+h1{font-size:1.25rem;margin:0 0 2px}
+.sub{color:var(--mut);font-size:.9rem;margin:0 0 14px}
+.bar{height:8px;background:var(--bd);border-radius:99px;overflow:hidden;margin:8px 0 6px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ac),var(--ac2));transition:width .3s}
+.stats{display:flex;justify-content:space-between;font-size:.85rem;color:var(--mut);margin-bottom:12px}
+.scene{perspective:1200px;height:300px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.card{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.card.flip{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--surf);border:1px solid var(--bd);border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:22px;box-shadow:0 8px 24px rgba(20,33,61,.12);overflow:auto}
+.back{transform:rotateY(180deg);border-top:5px solid var(--ac2)}
+.front{border-top:5px solid var(--ac)}
+.tag{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-bottom:10px}
+.big{font-size:1.45rem;font-weight:700;line-height:1.3}
+.word{font-size:2rem;font-weight:800;color:var(--ac2);margin-bottom:10px;word-break:break-word}
+.ex{font-style:italic;color:var(--mut);line-height:1.45}
+.hint{font-size:.78rem;color:var(--mut);margin-top:14px}
+.row{display:flex;gap:8px;margin-top:14px}
+.row button{flex:1}
+button{font:inherit;font-weight:600;padding:12px 10px;border-radius:12px;border:1px solid var(--bd);background:var(--surf);color:var(--tx);cursor:pointer}
+button:active{transform:scale(.97)}
+.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.no{background:var(--no);color:#fff;border-color:var(--no)}
+.tools button{font-size:.85rem;padding:9px 6px;font-weight:500}
+.tools{margin-top:12px}
+.done{display:none;text-align:center;padding:30px 10px}
+</style>
+</head>
+<body>
+<main>
+<h1>Flashcard One Word Substitution</h1>
+<p class="sub">100 kosakata bahasa Inggris. Ketuk kartu untuk membalik.</p>
+<div class="bar"><i id="pb"></i></div>
+<div class="stats"><span id="pos"></span><span id="sc"></span></div>
+<div id="study">
+<div class="scene" id="scene"><div class="card" id="card">
+<div class="face front"><div class="tag" id="ft"></div><div class="big" id="fv"></div><div class="hint">Ketuk untuk melihat jawaban</div></div>
+<div class="face back"><div class="tag" id="bt"></div><div id="bv"></div></div>
+</div></div>
+<div class="row"><button class="no" id="bn">Belum hafal</button><button class="ok" id="bk">Hafal</button></div>
+<div class="row tools"><button id="pv">← Sebelumnya</button><button id="nx">Berikutnya →</button></div>
+<div class="row tools"><button id="sh">Acak</button><button id="rv">Arah: Definisi → Kata</button><button id="fl">Belum hafal saja</button></div>
+</div>
+<div class="done" id="done"><h2>Selesai!</h2><p id="dt"></p><button id="rs">Ulangi semua</button></div>
+</main>
+<script>
+var D=[
+["A person who can speak many languages","Polyglot","She is a polyglot, fluent in six languages."],
+["A speech delivered without preparation","Extempore","He gave an extempore speech at the event."],
+["A person who loves books","Bibliophile","Being a bibliophile, she spends most of her time in the library."],
+["A government by the people","Democracy","India is the world’s largest democracy."],
+["One who looks on the bright side of things","Optimist","An optimist always expects good things to happen."],
+["A person who hates mankind","Misanthrope","A misanthrope avoids social gatherings."],
+["A person who is new to an activity","Novice","He is a novice at playing the piano."],
+["Fear of confined spaces","Claustrophobia","Her claustrophobia makes elevators uncomfortable."],
+["A life story written by oneself","Autobiography","Mandela’s autobiography inspired millions."],
+["One who walks while sleeping","Somnambulist","The child is a somnambulist and often walks at night."],
+["A being who never dies","Immortal","Legends say gods are immortal."],
+["A person who loves mankind","Philanthropist","The philanthropist donated millions to charity."],
+["A person who spends money carelessly","Spendthrift","He lost all his wealth because he was a spendthrift."],
+["A place where birds are kept","Aviary","The zoo has an aviary full of colorful parrots."],
+["A place where bees are kept","Apiary","Honey is collected from the apiary."],
+["A person who can endure pain without showing feelings","Stoic","He remained stoic despite the tragedy."],
+["A person who knows everything","Omniscient","In many religions, God is described as omniscient."],
+["A person who eats human flesh","Cannibal","Some ancient tribes were known as cannibals."],
+["A person who opposes war","Pacifist","The pacifist refused to join the army."],
+["A person who rules by absolute power","Autocrat","The king ruled as an autocrat."],
+["A person who pretends to be what he is not","Hypocrite","Calling for honesty while lying makes him a hypocrite."],
+["A person who studies earthquakes","Seismologist","The seismologist predicted aftershocks."],
+["A person who studies stars and planets","Astronomer","Galileo was a famous astronomer."],
+["A person who believes in fate","Fatalist","The fatalist accepted his failure as destiny."],
+["A person who studies ancient cultures through their remains","Archaeologist","The archaeologist discovered old ruins."],
+["A person who is always dissatisfied","Malcontent","He is a malcontent who always complains."],
+["A person who dies for a noble cause","Martyr","Bhagat Singh is remembered as a martyr."],
+["A person who talks too much","Garrulous","The garrulous man bored everyone with his endless stories."],
+["A person who eats too much","Glutton","Being a glutton, he finished the whole cake."],
+["An animal that can live both on land and in water","Amphibian","A frog is an amphibian."],
+["A person who loves himself excessively","Narcissist","The narcissist kept admiring himself in the mirror."],
+["A person who eats only vegetables","Vegetarian","She has been a vegetarian since childhood."],
+["An animal that eats both plants and animals","Omnivore","Humans are omnivores by nature."],
+["An animal that eats only meat","Carnivore","Lions are carnivores."],
+["A person who does not believe in God","Atheist","The atheist denied the existence of God."],
+["A person who believes in God","Theist","The theist prayed daily."],
+["A person who believes it is impossible to know whether God exists","Agnostic","The agnostic said we can never be sure if God exists."],
+["A person who rules a kingdom","Monarch","The monarch was loved by his people."],
+["Rule by a king or queen","Monarchy","Britain still has a monarchy."],
+["Rule by a few people","Oligarchy","The country was controlled by an oligarchy of businessmen."],
+["Rule by the clergy or priests","Theocracy","Iran is governed as a theocracy."],
+["Rule by the wealthy","Plutocracy","The nation turned into a plutocracy."],
+["Rule by officials","Bureaucracy","Too much bureaucracy slows progress."],
+["A state of society with no government or law","Anarchy","The country fell into anarchy after the war."],
+["A person who steals","Thief","The thief was caught by the police."],
+["A person who steals in houses","Burglar","The burglar broke in at night."],
+["A person who robs on the road","Bandit","The bandit attacked travelers."],
+["A person who kills animals for food","Hunter","The hunter shot a deer."],
+["A person who sells medicines","Chemist","The chemist gave me cough syrup."],
+["A person who composes music","Composer","Beethoven was a great composer."],
+["A person who writes poems", "Poet", "Wordsworth is a famous poet."],
+["A person who writes novels", "Novelist", "Dickens was a novelist."],
+["A person who writes plays", "Dramatist", "Shakespeare was the greatest dramatist."],
+["A person who plays the piano", "Pianist", "The pianist played beautifully."],
+["A person who plays the violin", "Violinist", "The violinist amazed the audience."],
+["A person who paints", "Painter", "Picasso was a great painter."],
+["A person who carves in wood or stone", "Sculptor", "Michelangelo was a famous sculptor."],
+["A person who studies weather", "Meteorologist", "The meteorologist predicted rain."],
+["A person who studies insects", "Entomologist", "The entomologist discovered a new species of beetle."],
+["A person who studies plants", "Botanist", "The botanist researched medicinal plants."],
+["A person who studies animals", "Zoologist", "A zoologist studies animal behavior."],
+["A person who studies birds", "Ornithologist", "The ornithologist observed migrating birds."],
+["A person who studies human societies", "Anthropologist", "The anthropologist lived among tribes."],
+["A person who studies languages", "Linguist", "The linguist could speak ten languages."],
+["A person who makes maps", "Cartographer", "The cartographer drew an accurate map."],
+["A person who draws cartoons", "Cartoonist", "R. K. Laxman was a famous cartoonist."],
+["A person who repairs shoes", "Cobbler", "The cobbler mended my sandals."],
+["A person who makes things from wood", "Carpenter", "The carpenter built a wooden chair."],
+["A person who makes bread", "Baker", "The baker sold fresh bread."],
+["A person who makes clothes", "Tailor", "The tailor stitched my suit."],
+["A person who treats teeth", "Dentist", "The dentist removed her wisdom tooth."],
+["A person who treats animals", "Veterinarian", "The veterinarian treated the sick dog."],
+["A person who treats eyes", "Ophthalmologist", "The ophthalmologist prescribed glasses."],
+["A person who treats children", "Pediatrician", "The pediatrician gave the child a vaccine."],
+["A person who treats heart diseases", "Cardiologist", "The cardiologist performed the surgery."],
+["A person who treats mental illness", "Psychiatrist", "The psychiatrist counseled the patient."],
+["A person who treats skin diseases", "Dermatologist", "The dermatologist gave him cream for acne."],
+["A person who travels", "Traveler", "The traveler visited many countries."],
+["A person who travels on foot", "Pedestrian", "The pedestrian crossed the road carefully."],
+["A person who sells flowers", "Florist", "The florist decorated the hall with roses."],
+["A person who sells fruits and vegetables", "Greengrocer", "The greengrocer had fresh mangoes."],
+["A person who sells fish", "Fishmonger", "The fishmonger displayed fresh salmon."],
+["A person who sells meat", "Butcher", "The butcher cut the meat."],
+["A person who sells books", "Bookseller", "The bookseller suggested a bestseller."],
+["A person who sells medicines legally", "Pharmacist", "The pharmacist gave me antibiotics."],
+["A person who collects stamps", "Philatelist", "My uncle is a philatelist with rare stamps."],
+["A person who collects coins", "Numismatist", "The numismatist displayed old coins."],
+["A person who compiles dictionaries", "Lexicographer", "The lexicographer spent years compiling a new dictionary."],
+["A person who grows and cares for gardens and plants", "Horticulturist", "The horticulturist designed a beautiful rose garden."],
+["A person who collects art or rare objects", "Collector", "The collector bought a rare painting."],
+["A person who designs buildings", "Architect", "The architect designed a new bridge."],
+["A person who repairs cars", "Mechanic", "The mechanic fixed the engine."],
+["A person who flies an aircraft", "Pilot", "The pilot landed safely."],
+["A person who drives a bus or other vehicle", "Driver", "The driver stopped at the station."],
+["A person who is paid to drive a private car", "Chauffeur", "The chauffeur opened the car door."],
+["A person who works on a ship", "Sailor", "The sailor crossed the ocean."],
+["A person who commands a ship", "Captain", "The captain steered through the storm."],
+["A person who travels in space", "Astronaut", "Neil Armstrong was the first astronaut on the moon."],
+["A person who studies the origin and structure of the universe", "Cosmologist", "The cosmologist studied the origin of the universe."],
+["A person who studies the physics of stars, galaxies and other objects in space", "Astrophysicist", "The astrophysicist explained black holes."]
+];
+var $=function(i){return document.getElementById(i)};
+var deck=[],idx=0,known={},rev=false,onlyNo=false,flipped=false;
+function build(){
+ deck=[];for(var i=0;i<D.length;i++){if(!onlyNo||!known[i])deck.push(i)}
+ idx=0;
+}
+function shuffle(){for(var i=deck.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=deck[i];deck[i]=deck[j];deck[j]=t}idx=0}
+function setFlip(f){flipped=f;$('card').classList.toggle('flip',f)}
+function render(){
+ var n=Object.keys(known).filter(function(k){return known[k]}).length;
+ $('pb').style.width=(n/D.length*100)+'%';
+ $('sc').textContent='Hafal: '+n+' / '+D.length;
+ if(!deck.length){$('study').style.display='none';$('done').style.display='block';$('dt').textContent='Semua kartu sudah dihafal. Kerja bagus!';$('pos').textContent='';return}
+ $('study').style.display='block';$('done').style.display='none';
+ var d=D[deck[idx]];
+ $('pos').textContent='Kartu '+(idx+1)+' dari '+deck.length;
+ $('ft').textContent=rev?'Kata':'Definisi';$('bt').textContent=rev?'Definisi':'Kata';
+ $('fv').innerHTML=rev?'<span class="word" style="margin:0">'+d[1]+'</span>':d[0];
+ $('bv').innerHTML=rev?'<div class="big">'+d[0]+'</div><div class="ex" style="margin-top:12px">“'+d[2]+'”</div>':'<div class="word">'+d[1]+'</div><div class="ex">“'+d[2]+'”</div>';
+}
+function go(s){setFlip(false);setTimeout(function(){idx=(idx+s+deck.length)%deck.length;render()},s?120:0)}
+function mark(v){var c=deck[idx];known[c]=v;if(onlyNo&&v){deck.splice(idx,1);if(idx>=deck.length)idx=0;setFlip(false);render()}else{go(1);render()}}
+$('scene').onclick=function(){setFlip(!flipped)};
+$('nx').onclick=function(){go(1)};$('pv').onclick=function(){go(-1)};
+$('bk').onclick=function(){mark(true)};$('bn').onclick=function(){mark(false)};
+$('sh').onclick=function(){setFlip(false);shuffle();render()};
+$('rv').onclick=function(){rev=!rev;this.textContent=rev?'Arah: Kata → Definisi':'Arah: Definisi → Kata';setFlip(false);render()};
+$('fl').onclick=function(){onlyNo=!onlyNo;this.textContent=onlyNo?'Tampilkan semua':'Belum hafal saja';this.style.borderColor=onlyNo?'var(--ac)':'';setFlip(false);build();render()};
+$('rs').onclick=function(){known={};onlyNo=false;$('fl').textContent='Belum hafal saja';build();render()};
+document.addEventListener('keydown',function(e){
+ if(e.key===' '||e.key==='Enter'){e.preventDefault();setFlip(!flipped)}
+ else if(e.key==='ArrowRight')go(1);else if(e.key==='ArrowLeft')go(-1);
+});
+build();render();
+</script>
+</body>
+</html>
